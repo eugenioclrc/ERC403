@@ -11,19 +11,11 @@ abstract contract ERC403 {
     //////////////////////////////////////////////////////////////*/
 
     event TransferSingle(
-        address indexed operator,
-        address indexed from,
-        address indexed to,
-        uint256 id,
-        uint256 amount
+        address indexed operator, address indexed from, address indexed to, uint256 id, uint256 amount
     );
 
     event TransferBatch(
-        address indexed operator,
-        address indexed from,
-        address indexed to,
-        uint256[] ids,
-        uint256[] amounts
+        address indexed operator, address indexed from, address indexed to, uint256[] ids, uint256[] amounts
     );
 
     event ApprovalForAll(address indexed owner, address indexed operator, bool approved);
@@ -36,6 +28,7 @@ abstract contract ERC403 {
 
     mapping(uint256 tokenId => Token token) public tokenIdToERC20;
     //mapping(address => mapping(uint256 => uint256)) public balanceOf;
+
     function balanceOf(address owner, uint256 id) public view returns (uint256) {
         Token token = tokenIdToERC20[id];
         if (address(token) == address(0)) {
@@ -63,13 +56,10 @@ abstract contract ERC403 {
         emit ApprovalForAll(msg.sender, operator, approved);
     }
 
-    function safeTransferFrom(
-        address from,
-        address to,
-        uint256 id,
-        uint256 amount,
-        bytes calldata data
-    ) public virtual {
+    function safeTransferFrom(address from, address to, uint256 id, uint256 amount, bytes calldata data)
+        public
+        virtual
+    {
         Token token = tokenIdToERC20[id];
         require(address(token) != address(0), "INVALID_ID");
 
@@ -82,8 +72,8 @@ abstract contract ERC403 {
         require(
             to.code.length == 0
                 ? to != address(0)
-                : ERC1155TokenReceiver(to).onERC1155Received(msg.sender, from, id, amount, data) ==
-                    ERC1155TokenReceiver.onERC1155Received.selector,
+                : ERC1155TokenReceiver(to).onERC1155Received(msg.sender, from, id, amount, data)
+                    == ERC1155TokenReceiver.onERC1155Received.selector,
             "UNSAFE_RECIPIENT"
         );
     }
@@ -103,15 +93,14 @@ abstract contract ERC403 {
         uint256 id;
         uint256 amount;
 
-        for (uint256 i = 0; i < ids.length; ) {
+        for (uint256 i = 0; i < ids.length;) {
             id = ids[i];
             Token token = tokenIdToERC20[id];
             require(address(token) != address(0), "INVALID_ID");
-    
+
             amount = amounts[i];
 
             token.erc1155Transfer(from, to, amount);
-
 
             // An array can't have a total length
             // larger than the max uint256 value.
@@ -125,8 +114,8 @@ abstract contract ERC403 {
         require(
             to.code.length == 0
                 ? to != address(0)
-                : ERC1155TokenReceiver(to).onERC1155BatchReceived(msg.sender, from, ids, amounts, data) ==
-                    ERC1155TokenReceiver.onERC1155BatchReceived.selector,
+                : ERC1155TokenReceiver(to).onERC1155BatchReceived(msg.sender, from, ids, amounts, data)
+                    == ERC1155TokenReceiver.onERC1155BatchReceived.selector,
             "UNSAFE_RECIPIENT"
         );
     }
@@ -155,27 +144,21 @@ abstract contract ERC403 {
     //////////////////////////////////////////////////////////////*/
 
     function supportsInterface(bytes4 interfaceId) public view virtual returns (bool) {
-        return
-            interfaceId == 0x01ffc9a7 || // ERC165 Interface ID for ERC165
-            interfaceId == 0xd9b67a26 || // ERC165 Interface ID for ERC1155
-            interfaceId == 0x0e89341c; // ERC165 Interface ID for ERC1155MetadataURI
+        return interfaceId == 0x01ffc9a7 // ERC165 Interface ID for ERC165
+            || interfaceId == 0xd9b67a26 // ERC165 Interface ID for ERC1155
+            || interfaceId == 0x0e89341c; // ERC165 Interface ID for ERC1155MetadataURI
     }
 
     /*//////////////////////////////////////////////////////////////
                         INTERNAL MINT/BURN LOGIC
     //////////////////////////////////////////////////////////////*/
 
-    function _mint(
-        address to,
-        uint256 id,
-        uint256 amount,
-        bytes memory data
-    ) internal virtual {
+    function _mint(address to, uint256 id, uint256 amount, bytes memory data) internal virtual {
         Token token = tokenIdToERC20[id];
         if (address(token) == address(0)) {
             // todo use id number in name and symbol
             token = new Token(id);
-            tokenIdToERC20[id] = token;     
+            tokenIdToERC20[id] = token;
         }
         token.mint(to, amount * 1 ether);
 
@@ -184,28 +167,26 @@ abstract contract ERC403 {
         require(
             to.code.length == 0
                 ? to != address(0)
-                : ERC1155TokenReceiver(to).onERC1155Received(msg.sender, address(0), id, amount, data) ==
-                    ERC1155TokenReceiver.onERC1155Received.selector,
+                : ERC1155TokenReceiver(to).onERC1155Received(msg.sender, address(0), id, amount, data)
+                    == ERC1155TokenReceiver.onERC1155Received.selector,
             "UNSAFE_RECIPIENT"
         );
     }
 
-    function _batchMint(
-        address to,
-        uint256[] memory ids,
-        uint256[] memory amounts,
-        bytes memory data
-    ) internal virtual {
+    function _batchMint(address to, uint256[] memory ids, uint256[] memory amounts, bytes memory data)
+        internal
+        virtual
+    {
         uint256 idsLength = ids.length; // Saves MLOADs.
 
         require(idsLength == amounts.length, "LENGTH_MISMATCH");
 
-        for (uint256 i = 0; i < idsLength; ) {
+        for (uint256 i = 0; i < idsLength;) {
             Token token = tokenIdToERC20[ids[i]];
             if (address(token) == address(0)) {
                 // todo use id number in name and symbol
                 token = new Token(ids[i]);
-                tokenIdToERC20[ids[i]] = token;     
+                tokenIdToERC20[ids[i]] = token;
             }
             token.mint(to, amounts[i] * 1 ether);
 
@@ -221,8 +202,8 @@ abstract contract ERC403 {
         require(
             to.code.length == 0
                 ? to != address(0)
-                : ERC1155TokenReceiver(to).onERC1155BatchReceived(msg.sender, address(0), ids, amounts, data) ==
-                    ERC1155TokenReceiver.onERC1155BatchReceived.selector,
+                : ERC1155TokenReceiver(to).onERC1155BatchReceived(msg.sender, address(0), ids, amounts, data)
+                    == ERC1155TokenReceiver.onERC1155BatchReceived.selector,
             "UNSAFE_RECIPIENT"
         );
     }
@@ -265,23 +246,15 @@ abstract contract ERC403 {
 /// @notice A generic interface for a contract which properly accepts ERC1155 tokens.
 /// @author Solmate (https://github.com/transmissions11/solmate/blob/main/src/tokens/ERC1155.sol)
 abstract contract ERC1155TokenReceiver {
-    function onERC1155Received(
-        address,
-        address,
-        uint256,
-        uint256,
-        bytes calldata
-    ) external virtual returns (bytes4) {
+    function onERC1155Received(address, address, uint256, uint256, bytes calldata) external virtual returns (bytes4) {
         return ERC1155TokenReceiver.onERC1155Received.selector;
     }
 
-    function onERC1155BatchReceived(
-        address,
-        address,
-        uint256[] calldata,
-        uint256[] calldata,
-        bytes calldata
-    ) external virtual returns (bytes4) {
+    function onERC1155BatchReceived(address, address, uint256[] calldata, uint256[] calldata, bytes calldata)
+        external
+        virtual
+        returns (bytes4)
+    {
         return ERC1155TokenReceiver.onERC1155BatchReceived.selector;
     }
 }

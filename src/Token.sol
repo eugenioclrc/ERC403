@@ -9,6 +9,7 @@ contract Token is ERC20 {
     uint256 public immutable tokenId;
     // owner is the 403 contract
     address private immutable _owner;
+
     constructor(uint256 _tokenId) ERC20("Token", "TKN", 18) {
         tokenId = _tokenId;
         _owner = msg.sender;
@@ -32,13 +33,10 @@ contract Token is ERC20 {
         }
 
         emit Transfer(from, to, amount);
-
-    } 
+    }
 
     function mint(address to, uint256 amount) public {
         require(msg.sender == _owner, "!owner");
         _mint(to, amount);
     }
-
-
 }
