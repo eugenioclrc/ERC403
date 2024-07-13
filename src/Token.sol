@@ -14,8 +14,8 @@ contract Token is ERC20 {
         tokenId = _tokenId;
         _owner = msg.sender;
         string memory idStr = LibString.toString(_tokenId);
-        name = string.concat("Token ERC404, id ", idStr);
-        symbol = string.concat("ERC404-", idStr);
+        name = string.concat("Token ERC403, id ", idStr);
+        symbol = string.concat("ERC403-", idStr);
     }
 
     function erc1155Transfer(address from, address to, uint256 amount) public {
