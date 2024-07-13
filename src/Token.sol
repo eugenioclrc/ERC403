@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: AGPL-3.0-only
+// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.4;
 
 import {ERC20} from "./ERC20.sol";
@@ -19,6 +19,9 @@ contract Token is ERC20 {
 
     function erc1155Transfer(address from, address to, uint256 amount) public {
         require(msg.sender == _owner, "!owner");
+
+        // @notice amount in items has no decimals, so `* 1 ether` transform it in token
+        amount = amount * 1 ether;
 
         balanceOf[from] -= amount;
 
