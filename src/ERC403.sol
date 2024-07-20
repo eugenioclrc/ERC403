@@ -120,6 +120,27 @@ abstract contract ERC403 {
         );
     }
 
+    function emitEvents(uint256 _tokenId, address _from, uint256 _amountBurn, address _to, uint256 _amountMint)
+        external
+    {
+        require(address(tokenIdToERC20[_tokenId]) == msg.sender, "INVALID_ID");
+        if (_amountBurn == 0 && _amountMint == 0) {
+            return;
+        } else if (_amountBurn == _amountMint) {
+            emit TransferSingle(msg.sender, _from, _to, _tokenId, _amountBurn);
+        } else if (_amountBurn > _amountMint) {
+            emit TransferSingle(msg.sender, _from, address(0), _tokenId, _amountBurn - _amountMint);
+            if (_amountMint > 0) {
+                emit TransferSingle(msg.sender, _from, _to, _tokenId, _amountMint);
+            }
+        } else if (_amountBurn < _amountMint) {
+            emit TransferSingle(msg.sender, address(0), _to, _tokenId, _amountMint - _amountBurn);
+            if (_amountBurn > 0) {
+                emit TransferSingle(msg.sender, _from, _to, _tokenId, _amountBurn);
+            }
+        }
+    }
+
     function balanceOfBatch(address[] calldata owners, uint256[] calldata ids)
         public
         view
