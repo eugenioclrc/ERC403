@@ -167,7 +167,9 @@ abstract contract ERC403 {
     function supportsInterface(bytes4 interfaceId) public view virtual returns (bool) {
         return interfaceId == 0x01ffc9a7 // ERC165 Interface ID for ERC165
             || interfaceId == 0xd9b67a26 // ERC165 Interface ID for ERC1155
-            || interfaceId == 0x0e89341c; // ERC165 Interface ID for ERC1155MetadataURI
+            || interfaceId == 0x0e89341c // ERC165 Interface ID for ERC1155MetadataURI
+            || interfaceId == 0x36372b07 // ERC20 Interface ID for ERC20
+            || interfaceId == 0xa219a025; // ERC20Metadata Interface ID for ERC20Metadata
     }
 
     /*//////////////////////////////////////////////////////////////
